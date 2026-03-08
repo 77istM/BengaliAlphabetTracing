@@ -5,7 +5,7 @@ data class BengaliLetter(
     val mainPath: String,
     val guidePaths: List<String> = emptyList()
 )
-
+// working condition
 object AlphabetPaths {
     val letters = listOf(
         BengaliLetter(
