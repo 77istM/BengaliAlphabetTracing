@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.PathParser
+import kotlin.math.min
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,83 +44,114 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TracingScreen() {
-    // Example SVG path (You will need the actual Bengali SVG paths here)
-    // This is a simple curved path for demonstration
-    val dummySvgPath = "M 200 200 Q 400 50 600 200 T 800 500"
+    val letters = AlphabetPaths.letters
+    var currentLetterIndex by remember { mutableIntStateOf(0) }
+    val currentLetter = letters[currentLetterIndex]
 
     var userPath by remember { mutableStateOf(Path()) }
     var isTracing by remember { mutableStateOf(false) }
 
-    // Parse the SVG string into a Compose Path
-    val letterPath = remember {
-        PathParser.createPathFromPathData(dummySvgPath).asComposePath()
+    // Helper to scale paths
+    fun scalePath(svgData: String): Path {
+        val rawPath = PathParser.createPathFromPathData(svgData)
+        val bounds = android.graphics.RectF()
+        rawPath.computeBounds(bounds, true)
+
+        val targetSize = 800f
+        val scale = min(targetSize / (if (bounds.width() == 0f) 1f else bounds.width()), 
+                        targetSize / (if (bounds.height() == 0f) 1f else bounds.height()))
+        
+        val matrix = android.graphics.Matrix()
+        matrix.postTranslate(-bounds.left, -bounds.top)
+        matrix.postScale(scale, scale)
+        matrix.postTranslate(100f, 100f)
+        
+        rawPath.transform(matrix)
+        return rawPath.asComposePath()
+    }
+
+    // Prepare paths
+    val letterPath = remember(currentLetter) { scalePath(currentLetter.mainPath) }
+    val guidePaths = remember(currentLetter) { 
+        currentLetter.guidePaths.map { scalePath(it) } 
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Trace the path",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 32.dp)
+            text = "Trace: ${currentLetter.name}",
+            style = MaterialTheme.typography.headlineLarge,
+            modifier = Modifier.padding(bottom = 24.dp)
         )
 
         Box(
             modifier = Modifier
                 .size(350.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFFF0F0F0))
-                .pointerInput(Unit) {
+                .background(Color(0xFFF5F5F5))
+                .pointerInput(currentLetter) {
                     detectDragGestures(
                         onDragStart = { offset ->
                             isTracing = true
-                            userPath = Path().apply { moveTo(offset.x, offset.y) }
+                            val newPath = Path()
+                            newPath.moveTo(offset.x, offset.y)
+                            userPath = newPath
                         },
-                        onDragEnd = {
-                            isTracing = false
-                            // Here you would validate if the path covers the letter
-                        },
+                        onDragEnd = { isTracing = false },
                         onDrag = { change, _ ->
                             if (isTracing) {
-                                userPath.lineTo(change.position.x, change.position.y)
-                                // Trigger recomposition to draw the new line
-                                userPath = Path().apply { addPath(userPath) }
+                                val newPath = Path().apply {
+                                    addPath(userPath)
+                                    lineTo(change.position.x, change.position.y)
+                                }
+                                userPath = newPath
                             }
                         }
                     )
                 }
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // 1. Draw the template (background letter)
+                // 1. Draw the main letter guide
                 drawPath(
                     path = letterPath,
-                    color = Color.LightGray,
-                    style = Stroke(
-                        width = 80f,
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round
-                    )
+                    color = Color.LightGray.copy(alpha = 0.5f),
+                    style = Stroke(width = 60f, cap = StrokeCap.Round, join = StrokeJoin.Round)
                 )
+                
+                // 2. Draw additional guide lines (like for 'O')
+                guidePaths.forEach { path ->
+                    drawPath(
+                        path = path,
+                        color = Color.Red.copy(alpha = 0.3f),
+                        style = Stroke(width = 4f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    )
+                }
 
-                // 2. Draw the user's tracing progress
+                // 3. Draw user tracing
                 drawPath(
                     path = userPath,
-                    color = Color(0xFF58CC02), // Duolingo Green
-                    style = Stroke(
-                        width = 80f,
-                        cap = StrokeCap.Round,
-                        join = StrokeJoin.Round
-                    )
+                    color = Color(0xFF4CAF50),
+                    style = Stroke(width = 45f, cap = StrokeCap.Round, join = StrokeJoin.Round)
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = { userPath = Path() }) {
-            Text("Clear")
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = { userPath = Path() }) {
+                Text("Clear")
+            }
+            
+            Button(onClick = {
+                currentLetterIndex = (currentLetterIndex + 1) % letters.size
+                userPath = Path()
+            }) {
+                Text("Next Letter")
+            }
         }
     }
 }
