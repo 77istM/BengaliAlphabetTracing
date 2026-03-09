@@ -124,6 +124,15 @@ fun TracingScreen() {
                     color = Color.LightGray.copy(alpha = 0.5f),
                     style = Stroke(width = 60f, cap = StrokeCap.Round, join = StrokeJoin.Round)
                 )
+                
+                // 2. Draw additional guide lines (like for 'O')
+                guidePaths.forEach { path ->
+                    drawPath(
+                        path = path,
+                        color = Color.Red.copy(alpha = 0.3f),
+                        style = Stroke(width = 4f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    )
+                }
 
                 // 2. Draw additional guide lines
                 guidePaths.forEach { path ->
