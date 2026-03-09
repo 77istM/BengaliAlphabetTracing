@@ -144,6 +144,13 @@ fun TracingScreen() {
         Spacer(modifier = Modifier.height(32.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = {
+                currentLetterIndex = (currentLetterIndex - 1 + letters.size) % letters.size
+                userPath = Path()
+            }) {
+                Text("Previous Letter")
+            }
+
             Button(onClick = { userPath = Path() }) {
                 Text("Clear")
             }
