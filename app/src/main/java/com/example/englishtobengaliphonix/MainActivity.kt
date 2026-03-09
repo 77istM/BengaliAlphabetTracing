@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.PathParser
@@ -58,22 +59,22 @@ fun TracingScreen() {
         rawPath.computeBounds(bounds, true)
 
         val targetSize = 800f
-        val scale = min(targetSize / (if (bounds.width() == 0f) 1f else bounds.width()), 
-                        targetSize / (if (bounds.height() == 0f) 1f else bounds.height()))
-        
+        val scale = min(targetSize / (if (bounds.width() == 0f) 1f else bounds.width()),
+            targetSize / (if (bounds.height() == 0f) 1f else bounds.height()))
+
         val matrix = android.graphics.Matrix()
         matrix.postTranslate(-bounds.left, -bounds.top)
         matrix.postScale(scale, scale)
         matrix.postTranslate(100f, 100f)
-        
+
         rawPath.transform(matrix)
         return rawPath.asComposePath()
     }
 
     // Prepare paths
     val letterPath = remember(currentLetter) { scalePath(currentLetter.mainPath) }
-    val guidePaths = remember(currentLetter) { 
-        currentLetter.guidePaths.map { scalePath(it) } 
+    val guidePaths = remember(currentLetter) {
+        currentLetter.guidePaths.map { scalePath(it) }
     }
 
     Column(
@@ -96,8 +97,10 @@ fun TracingScreen() {
                     detectDragGestures(
                         onDragStart = { offset ->
                             isTracing = true
-                            val newPath = Path()
-                            newPath.moveTo(offset.x, offset.y)
+                            val newPath = Path().apply {
+                                addPath(userPath)
+                                moveTo(offset.x, offset.y)
+                            }
                             userPath = newPath
                         },
                         onDragEnd = { isTracing = false },
@@ -114,7 +117,8 @@ fun TracingScreen() {
                 }
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // 1. Draw the main letter guide
+                // 1. Draw the main letter guide (Background)
+                // Note: If letterPath is an outline, Fill is often better than Stroke here.
                 drawPath(
                     path = letterPath,
                     color = Color.LightGray.copy(alpha = 0.5f),
@@ -130,22 +134,41 @@ fun TracingScreen() {
                     )
                 }
 
-                // 3. Draw user tracing
-                drawPath(
-                    path = userPath,
-                    color = Color(0xFF4CAF50),
-                    style = Stroke(width = 45f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-                )
+                // 2. Draw additional guide lines
+                guidePaths.forEach { path ->
+                    drawPath(
+                        path = path,
+                        color = Color.Red.copy(alpha = 0.3f),
+                        style = Stroke(width = 4f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    )
+                }
+
+                // 3. Draw user tracing, clipped strictly to the letter path
+                clipPath(path = letterPath) {
+                    drawPath(
+                        path = userPath,
+                        color = Color(0xFF4CAF50),
+                        // Increased stroke width slightly to ensure it fills the clipped area well
+                        style = Stroke(width = 80f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Button(onClick = {
+                currentLetterIndex = (currentLetterIndex - 1 + letters.size) % letters.size
+                userPath = Path()
+            }) {
+                Text("Previous Letter")
+            }
+
             Button(onClick = { userPath = Path() }) {
                 Text("Clear")
             }
-            
+
             Button(onClick = {
                 currentLetterIndex = (currentLetterIndex + 1) % letters.size
                 userPath = Path()
