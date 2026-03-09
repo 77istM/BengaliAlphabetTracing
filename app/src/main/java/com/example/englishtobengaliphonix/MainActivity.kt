@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.PathParser
@@ -97,7 +98,7 @@ fun TracingScreen() {
                         onDragStart = { offset ->
                             isTracing = true
                             val newPath = Path().apply {
-                                addPath(userPath) // Preserves the previous lines
+                                addPath(userPath)
                                 moveTo(offset.x, offset.y)
                             }
                             userPath = newPath
@@ -116,7 +117,8 @@ fun TracingScreen() {
                 }
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                // 1. Draw the main letter guide
+                // 1. Draw the main letter guide (Background)
+                // Note: If letterPath is an outline, Fill is often better than Stroke here.
                 drawPath(
                     path = letterPath,
                     color = Color.LightGray.copy(alpha = 0.5f),
@@ -132,12 +134,15 @@ fun TracingScreen() {
                     )
                 }
 
-                // 3. Draw user tracing
-                drawPath(
-                    path = userPath,
-                    color = Color(0xFF4CAF50),
-                    style = Stroke(width = 45f, cap = StrokeCap.Round, join = StrokeJoin.Round)
-                )
+                // 3. Draw user tracing, clipped strictly to the letter path
+                clipPath(path = letterPath) {
+                    drawPath(
+                        path = userPath,
+                        color = Color(0xFF4CAF50),
+                        // Increased stroke width slightly to ensure it fills the clipped area well
+                        style = Stroke(width = 80f, cap = StrokeCap.Round, join = StrokeJoin.Round)
+                    )
+                }
             }
         }
 
