@@ -1,5 +1,6 @@
 package com.example.englishtobengaliphonix
 
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,9 +25,12 @@ import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.PathParser
 import kotlin.math.min
+import androidx.compose.animation.core.*
+import androidx.compose.ui.draw.scale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +51,56 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TracingScreen() {
+    val context = LocalContext.current // Get context for MediaPlayer
     val letters = AlphabetPaths.letters
     var currentLetterIndex by remember { mutableIntStateOf(0) }
     val currentLetter = letters[currentLetterIndex]
 
     var userPath by remember { mutableStateOf(Path()) }
     var isTracing by remember { mutableStateOf(false) }
+
+    // State to hold the MediaPlayer
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    // Track whether sound is playing
+    var isPlaying by remember { mutableStateOf(false) }
+
+    // Create a pulsing animation
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = if (isPlaying) 1.3f else 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(400),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "scale"
+    )
+    // Helper function to play sound
+    val playSound = {
+        currentLetter.audioResId?.let { resId ->
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer.create(context, resId)
+            isPlaying = true // Start animation
+
+            mediaPlayer?.setOnCompletionListener {
+                isPlaying = false // Stop animation when audio finishes
+            }
+
+            mediaPlayer?.start()
+        }
+    }
+
+    // Play sound automatically when the current letter changes
+    LaunchedEffect(currentLetter) {
+        playSound()
+    }
+
+    // Clean up MediaPlayer when the composable is destroyed
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayer?.release()
+        }
+    }
 
     // Helper to scale paths
     fun scalePath(svgData: String): Path {
@@ -82,11 +132,27 @@ fun TracingScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Trace: ${currentLetter.name}",
-            style = MaterialTheme.typography.headlineLarge,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+
+        // Updated Header with Speaker/Play Button
+        Row(
+            modifier = Modifier.padding(bottom = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Trace: ${currentLetter.name}",
+                style = MaterialTheme.typography.headlineLarge
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            IconButton(onClick = { playSound() }) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Play pronunciation",
+                    modifier = Modifier.scale(scale), // Apply animation here
+                    tint = if (isPlaying) MaterialTheme.colorScheme.primary else LocalContentColor.current // Change colour whilst playing
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
