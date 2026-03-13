@@ -7,8 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -38,16 +37,50 @@ fun CategorySelector(
     onCategorySelected: (LetterCategory) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    // Stable alternative to FlowRow using Column and Rows
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(LetterCategory.entries) { category ->
+        val categories = LetterCategory.entries
+        
+        // Row 1: All and Vowels
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             CategoryChip(
-                label = category.label,
-                isSelected = category == selectedCategory,
-                onClick = { onCategorySelected(category) }
+                label = categories[0].label,
+                isSelected = categories[0] == selectedCategory,
+                onClick = { onCategorySelected(categories[0]) },
+                modifier = Modifier.weight(1f)
+            )
+            CategoryChip(
+                label = categories[1].label,
+                isSelected = categories[1] == selectedCategory,
+                onClick = { onCategorySelected(categories[1]) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+        
+        // Row 2: Consonants and Numbers
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CategoryChip(
+                label = categories[2].label,
+                isSelected = categories[2] == selectedCategory,
+                onClick = { onCategorySelected(categories[2]) },
+                modifier = Modifier.weight(1f)
+            )
+            CategoryChip(
+                label = categories[3].label,
+                isSelected = categories[3] == selectedCategory,
+                onClick = { onCategorySelected(categories[3]) },
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -57,7 +90,8 @@ fun CategorySelector(
 private fun CategoryChip(
     label: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected)
@@ -79,23 +113,26 @@ private fun CategoryChip(
     val shadowElevation = if (isSelected) 4.dp else 0.dp
 
     Box(
-        modifier = Modifier
-            .shadow(elevation = shadowElevation, shape = RoundedCornerShape(50))
-            .clip(RoundedCornerShape(50))
+        modifier = modifier
+            .shadow(elevation = shadowElevation, shape = RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(color = Color.White.copy(alpha = 0.3f))
             ) { onClick() }
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = label,
+            // Replace / with newline to show Bengali text below English
+            text = label.replace("/", "\n"),
             color = contentColor,
-            fontSize = 13.sp,
+            fontSize = 12.sp,
+            lineHeight = 14.sp,
+            textAlign = TextAlign.Center,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            maxLines = 1
+            maxLines = 2
         )
     }
 }
