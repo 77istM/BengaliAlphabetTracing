@@ -14,8 +14,6 @@ The app covers the complete Bengali writing system across four categories:
 - **Numbers (সংখ্যা)** — Bengali numerals 0–10 (11 numerals)
 - **All** — all 61 characters in sequence
 
-![Bengali Alphabet Chart](asset/Bengali_Alphabet_-_বাংলা_বর্ণমালা.svg)
-
 ---
 
 ### ✍️ Interactive Tracing Canvas
@@ -46,19 +44,15 @@ Filter the practice session to focus on a specific group:
 
 ### Vowels (স্বরবর্ণ)
 
-![Vowel Chart](asset/vowel.png)
-
----
+<img src="asset/vowel.png" width="400" height="auto" />   
 
 ### Consonants (ব্যঞ্জনবর্ণ)
 
-![Consonant Chart](asset/consonant.png)
-
----
+<img src="asset/consonant.png" width="400" height="auto" />  
 
 ### Numbers (সংখ্যা)
 
-![Number Chart](asset/number.png)
+<img src="asset/number.png" width="400" height="auto" />  
 
 ---
 
