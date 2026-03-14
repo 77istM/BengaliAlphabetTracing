@@ -16,6 +16,21 @@ The app covers the complete Bengali writing system across four categories:
 
 ---
 
+<table>
+  <tr>
+    <td align="center"><b>Vowels (স্বরবর্ণ)</b></td>
+    <td align="center"><b>Consonants (ব্যঞ্জনবর্ণ)</b></td>
+    <td align="center"><b>Numbers (সংখ্যা)</b></td>
+  </tr>
+  <tr>
+    <td><img src="asset/vowel.png" width="250" height="auto" /></td>
+    <td><img src="asset/consonant.png" width="250" height="auto" /></td>
+    <td><img src="asset/number.png" width="250" height="auto" /></td>
+  </tr>
+</table>
+
+---
+
 ### ✍️ Interactive Tracing Canvas
 Trace each letter by drawing on the on-screen canvas with your finger:
 
@@ -39,21 +54,6 @@ Filter the practice session to focus on a specific group:
 | Consonants / ব্যঞ্জনবর্ণ | ক খ গ ঘ ঙ … and more |
 | Numbers / সংখ্যা | ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯ ১০ |
 | All | Complete set of 62 characters |
-
----
-
-<table>
-  <tr>
-    <td align="center"><b>Vowels (স্বরবর্ণ)</b></td>
-    <td align="center"><b>Consonants (ব্যঞ্জনবর্ণ)</b></td>
-    <td align="center"><b>Numbers (সংখ্যা)</b></td>
-  </tr>
-  <tr>
-    <td><img src="asset/vowel.png" width="250" height="auto" /></td>
-    <td><img src="asset/consonant.png" width="250" height="auto" /></td>
-    <td><img src="asset/number.png" width="250" height="auto" /></td>
-  </tr>
-</table>
 
 ---
 
