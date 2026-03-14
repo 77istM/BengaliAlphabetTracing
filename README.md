@@ -42,17 +42,18 @@ Filter the practice session to focus on a specific group:
 
 ---
 
-### Vowels (স্বরবর্ণ)
-
-<img src="asset/vowel.png" width="400" height="auto" />   
-
-### Consonants (ব্যঞ্জনবর্ণ)
-
-<img src="asset/consonant.png" width="400" height="auto" />  
-
-### Numbers (সংখ্যা)
-
-<img src="asset/number.png" width="400" height="auto" />  
+<table>
+  <tr>
+    <td align="center"><b>Vowels (স্বরবর্ণ)</b></td>
+    <td align="center"><b>Consonants (ব্যঞ্জনবর্ণ)</b></td>
+    <td align="center"><b>Numbers (সংখ্যা)</b></td>
+  </tr>
+  <tr>
+    <td><img src="asset/vowel.png" width="250" height="auto" /></td>
+    <td><img src="asset/consonant.png" width="250" height="auto" /></td>
+    <td><img src="asset/number.png" width="250" height="auto" /></td>
+  </tr>
+</table>
 
 ---
 
