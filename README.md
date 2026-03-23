@@ -4,6 +4,13 @@ An interactive ***Android app*** for learning to write the Bengali alphabet thro
 
 ---
 
+## Demo Video
+
+- A short is available at: https://youtube.com/shorts/nPt05Z7ERsM.
+- Google Play: //Working towards
+
+---
+
 ## Features
 
 ### 📚 61 Bengali Characters
@@ -77,9 +84,3 @@ Filter the practice session to focus on a specific group:
 | Design | Material Design 3 |
 | Audio | Android MediaPlayer |
 
----
-
-## Demo Video
-
-- A short is available at: https://youtube.com/shorts/nPt05Z7ERsM.
-- Google Play: //Working towards
