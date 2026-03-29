@@ -1,12 +1,12 @@
 #	Idea
-1	Tracing accuracy scoring — evaluate how closely the user's strokes follow the guide path
-2	Progress tracking — remember which letters the user has practiced and show a progress bar
-3	Animated stroke guidance — animate the correct stroke order step-by-step before the user traces
-4	Quiz mode — show a letter name/audio and ask the user to identify or write the correct character
-5	Multi-language UI — add Bengali/English toggle for UI labels
-6	Difficulty levels — beginner (thick guide), intermediate (thin guide), advanced (no guide)
-7	Flashcard mode — flip between letter, transliteration, and example word
-8	Stroke-by-stroke hints — reveal guide strokes one at a time as hints
+-Tracing accuracy scoring — evaluate how closely the user's strokes follow the guide path
+
+-Progress tracking — remember which letters the user has practiced and show a progress bar
+
+-Animated stroke guidance — animate the correct stroke order step-by-step before the user traces
+
+-Stroke-by-stroke hints — reveal guide strokes one at a time as hints
+
 ---
 # Bengali Alphabet Tracing — বাংলা বর্ণমালা ট্রেসিং
 
