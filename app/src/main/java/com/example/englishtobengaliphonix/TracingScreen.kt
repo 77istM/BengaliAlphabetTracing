@@ -20,6 +20,10 @@ fun TracingScreen(
     val animStrokeIndex  by viewModel.animStrokeIndex.collectAsState()
     val animProgress     by viewModel.animProgress.collectAsState()
     val visibleHintCount by viewModel.visibleHintCount.collectAsState()
+    val lastScore        by viewModel.lastScore.collectAsState()
+    val hasUserDrawn     by viewModel.hasUserDrawn.collectAsState()
+    val categoryProgress by viewModel.categoryProgress.collectAsState()
+    val currentBestScore by viewModel.currentBestScore.collectAsState()
     val currentLetter    = viewModel.currentLetter
 
     val letterPath = remember(currentLetter) { scalePath(currentLetter.mainPath) }
@@ -42,6 +46,13 @@ fun TracingScreen(
         CategorySelector(
             selectedCategory = selectedCategory,
             onCategorySelected = { viewModel.selectCategory(it) }
+        )
+
+        // ── Category progress bar ────────────────────────────────────────────
+        CategoryProgressBar(
+            practicedCount = categoryProgress.first,
+            totalCount     = categoryProgress.second,
+            onClearProgress = { viewModel.clearAllProgress() }
         )
 
         HorizontalDivider(
@@ -76,17 +87,28 @@ fun TracingScreen(
                 onDragEnd        = { }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // ── Score card (shown after "Check Score" is tapped) ─────────────
+            if (lastScore != null) {
+                ScoreCard(
+                    lastScore = lastScore!!,
+                    bestScore = currentBestScore
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
             NavigationButtons(
-                onPrevious  = { viewModel.previousLetter() },
-                onClear     = { viewModel.clearPath() },
-                onNext      = { viewModel.nextLetter() },
-                onWatch     = { viewModel.startAnimation() },
-                onHint      = { viewModel.showNextHint() },
-                isAnimating = isAnimating,
-                hintCount   = visibleHintCount.coerceAtMost(guidePaths.size),
-                totalHints  = guidePaths.size
+                onPrevious   = { viewModel.previousLetter() },
+                onClear      = { viewModel.clearPath() },
+                onNext       = { viewModel.nextLetter() },
+                onWatch      = { viewModel.startAnimation() },
+                onHint       = { viewModel.showNextHint() },
+                onScore      = { viewModel.scoreUserPath() },
+                isAnimating  = isAnimating,
+                hintCount    = visibleHintCount.coerceAtMost(guidePaths.size),
+                totalHints   = guidePaths.size,
+                hasUserDrawn = hasUserDrawn
             )
         }
     }

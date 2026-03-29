@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -15,11 +16,16 @@ fun NavigationButtons(
     onNext: () -> Unit,
     onWatch: () -> Unit,
     onHint: () -> Unit,
+    onScore: () -> Unit,
     isAnimating: Boolean,
     hintCount: Int,
-    totalHints: Int
+    totalHints: Int,
+    hasUserDrawn: Boolean
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(onClick = onPrevious) { Text("Previous Letter") }
             Button(onClick = onClear)    { Text("Clear") }
@@ -38,6 +44,12 @@ fun NavigationButtons(
             ) {
                 Text("Hint ($hintCount/$totalHints)")
             }
+        }
+        Button(
+            onClick = onScore,
+            enabled = !isAnimating && hasUserDrawn
+        ) {
+            Text("✓ Check Score")
         }
     }
 }
