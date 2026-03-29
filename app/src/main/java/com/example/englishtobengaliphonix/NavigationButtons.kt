@@ -7,6 +7,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -27,29 +28,29 @@ fun NavigationButtons(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Button(onClick = onPrevious) { Text("Previous Letter") }
-            Button(onClick = onClear)    { Text("Clear") }
-            Button(onClick = onNext)     { Text("Next Letter") }
+            Button(onClick = onPrevious) { Text(stringResource(R.string.btn_previous)) }
+            Button(onClick = onClear)    { Text(stringResource(R.string.btn_clear)) }
+            Button(onClick = onNext)     { Text(stringResource(R.string.btn_next)) }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Button(
                 onClick = onWatch,
                 enabled = !isAnimating
             ) {
-                Text("▶ Watch")
+                Text(stringResource(R.string.btn_watch))
             }
             Button(
                 onClick = onHint,
                 enabled = !isAnimating && hintCount < totalHints
             ) {
-                Text("Hint ($hintCount/$totalHints)")
+                Text(stringResource(R.string.btn_hint, hintCount, totalHints))
             }
         }
         Button(
             onClick = onScore,
             enabled = !isAnimating && hasUserDrawn
         ) {
-            Text("✓ Check Score")
+            Text(stringResource(R.string.btn_check_score))
         }
     }
 }

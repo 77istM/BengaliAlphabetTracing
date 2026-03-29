@@ -2,6 +2,7 @@ package com.example.englishtobengaliphonix
 
 import android.app.Application
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.asAndroidPath
@@ -104,9 +105,18 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
         currentLetter.audioResId?.let { resId ->
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer.create(getApplication(), resId)
+            if (mediaPlayer == null) {
+                Log.e(TAG, "MediaPlayer.create() returned null for resId=$resId")
+                _isPlaying.value = false
+                return
+            }
             _isPlaying.value = true
             mediaPlayer?.setOnCompletionListener {
                 _isPlaying.value = false
+            }
+            mediaPlayer?.setOnErrorListener { _, _, _ ->
+                _isPlaying.value = false
+                true
             }
             mediaPlayer?.start()
         }
@@ -295,6 +305,7 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
     }
 
     companion object {
+        private const val TAG = "TracingViewModel"
         /** Number of interpolation steps per stroke during animation. */
         private const val ANIM_STEPS = 100
         /** Milliseconds between each animation step — 100 steps × 9 ms ≈ 900 ms per stroke. */

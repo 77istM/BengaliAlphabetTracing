@@ -7,6 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 /**
@@ -22,6 +25,7 @@ fun CategoryProgressBar(
     modifier: Modifier = Modifier
 ) {
     val fraction = if (totalCount > 0) practicedCount.toFloat() / totalCount else 0f
+    val clearDescription = stringResource(R.string.cd_clear_progress)
 
     Row(
         modifier = modifier
@@ -35,7 +39,7 @@ fun CategoryProgressBar(
             verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             Text(
-                text = "$practicedCount / $totalCount letters practiced",
+                text = stringResource(R.string.progress_label, practicedCount, totalCount),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -49,10 +53,11 @@ fun CategoryProgressBar(
         }
         TextButton(
             onClick = onClearProgress,
+            modifier = Modifier.semantics { contentDescription = clearDescription },
             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
         ) {
             Text(
-                text = "Clear",
+                text = stringResource(R.string.btn_clear_progress),
                 style = MaterialTheme.typography.labelSmall
             )
         }
