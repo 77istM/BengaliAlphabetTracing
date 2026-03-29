@@ -16,10 +16,16 @@ fun TracingScreen(
     val userPath         by viewModel.userPath.collectAsState()
     val isPlaying        by viewModel.isPlaying.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val isAnimating      by viewModel.isAnimating.collectAsState()
+    val animStrokeIndex  by viewModel.animStrokeIndex.collectAsState()
+    val animProgress     by viewModel.animProgress.collectAsState()
+    val visibleHintCount by viewModel.visibleHintCount.collectAsState()
     val currentLetter    = viewModel.currentLetter
 
     val letterPath = remember(currentLetter) { scalePath(currentLetter.mainPath) }
-    val guidePaths = remember(currentLetter) { currentLetter.guidePaths.map { scalePath(it) } }
+    val guidePaths = remember(currentLetter) {
+        viewModel.effectiveGuidePaths.map { scalePath(it) }
+    }
 
     LaunchedEffect(currentLetter) {
         viewModel.playSound()
@@ -58,20 +64,29 @@ fun TracingScreen(
             )
 
             TracingCanvas(
-                letterPath = letterPath,
-                guidePaths = guidePaths,
-                userPath = userPath,
-                onDragStart = { offset -> viewModel.startPath(offset) },
-                onDrag      = { position -> viewModel.dragTo(position) },
-                onDragEnd   = { /* future stroke-end logic */ }
+                letterPath       = letterPath,
+                guidePaths       = guidePaths,
+                userPath         = userPath,
+                isAnimating      = isAnimating,
+                animStrokeIndex  = animStrokeIndex,
+                animProgress     = animProgress,
+                visibleHintCount = visibleHintCount,
+                onDragStart      = { offset -> viewModel.startPath(offset) },
+                onDrag           = { position -> viewModel.dragTo(position) },
+                onDragEnd        = { }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             NavigationButtons(
-                onPrevious = { viewModel.previousLetter() },
-                onClear    = { viewModel.clearPath() },
-                onNext     = { viewModel.nextLetter() }
+                onPrevious  = { viewModel.previousLetter() },
+                onClear     = { viewModel.clearPath() },
+                onNext      = { viewModel.nextLetter() },
+                onWatch     = { viewModel.startAnimation() },
+                onHint      = { viewModel.showNextHint() },
+                isAnimating = isAnimating,
+                hintCount   = visibleHintCount.coerceAtMost(guidePaths.size),
+                totalHints  = guidePaths.size
             )
         }
     }
