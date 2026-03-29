@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
@@ -26,11 +27,11 @@ fun ScoreCard(
     bestScore: Float,
     modifier: Modifier = Modifier
 ) {
-    val (accentColor, feedback) = when {
-        lastScore >= SCORE_EXCELLENT -> Color(0xFF4CAF50) to "Excellent! \uD83C\uDF1F"
-        lastScore >= SCORE_GREAT     -> Color(0xFF2196F3) to "Great job! \uD83D\uDC4D"
-        lastScore >= SCORE_GOOD      -> Color(0xFFFF9800) to "Good effort! \uD83D\uDCAA"
-        else                         -> Color(0xFFF44336) to "Keep practicing! \u270F\uFE0F"
+    val (accentColor, feedbackRes) = when {
+        lastScore >= SCORE_EXCELLENT -> Color(0xFF4CAF50) to R.string.score_excellent
+        lastScore >= SCORE_GREAT     -> Color(0xFF2196F3) to R.string.score_great
+        lastScore >= SCORE_GOOD      -> Color(0xFFFF9800) to R.string.score_good
+        else                         -> Color(0xFFF44336) to R.string.score_keep_practicing
     }
 
     Card(
@@ -51,14 +52,14 @@ fun ScoreCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
-                    text = feedback,
+                    text = stringResource(feedbackRes),
                     style = MaterialTheme.typography.bodyMedium,
                     color = accentColor
                 )
                 // Show all-time best only when it differs from the current score
                 if (bestScore >= 0f && bestScore != lastScore) {
                     Text(
-                        text = "Best: ${bestScore.roundToInt()}%",
+                        text = stringResource(R.string.score_best, bestScore.roundToInt()),
                         style = MaterialTheme.typography.labelSmall,
                         color = accentColor.copy(alpha = 0.7f)
                     )

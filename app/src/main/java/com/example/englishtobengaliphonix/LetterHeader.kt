@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -35,14 +36,14 @@ fun LetterHeader(
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Trace: $letterName",
+            text = stringResource(R.string.trace_prefix) + letterName,
             style = MaterialTheme.typography.headlineLarge
         )
         Spacer(modifier = Modifier.width(16.dp))
         IconButton(onClick = onPlayClick) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
-                contentDescription = "Play pronunciation",
+                contentDescription = stringResource(R.string.cd_play_pronunciation, letterName),
                 modifier = Modifier.scale(iconScale),
                 tint = if (isPlaying) MaterialTheme.colorScheme.primary
                 else LocalContentColor.current
