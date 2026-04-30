@@ -7,24 +7,62 @@ import androidx.compose.ui.graphics.asComposePath
 import androidx.core.graphics.PathParser
 import kotlin.math.min
 
-fun scalePath(svgData: String): Path {
+/**
+ * Scales SVG path data to fit within a target canvas of [canvasSize] × [canvasSize] pixels,
+ * with a [padding]-pixel margin on each side.
+ *
+ * When [canvasSize] is not supplied the legacy fixed value (800 px canvas + 100 px padding)
+ * is used so existing call-sites continue to work unchanged.
+ */
+fun scalePath(
+    svgData: String,
+    canvasSize: Float = 800f,
+    padding: Float = 100f
+): Path {
     val rawPath = PathParser.createPathFromPathData(svgData)
     val bounds = android.graphics.RectF()
     rawPath.computeBounds(bounds, true)
 
-    val targetSize = 800f
+    val availableSize = canvasSize - 2 * padding
     val scale = min(
-        targetSize / (if (bounds.width() == 0f) 1f else bounds.width()),
-        targetSize / (if (bounds.height() == 0f) 1f else bounds.height())
+        availableSize / (if (bounds.width() == 0f) 1f else bounds.width()),
+        availableSize / (if (bounds.height() == 0f) 1f else bounds.height())
     )
 
     val matrix = android.graphics.Matrix()
     matrix.postTranslate(-bounds.left, -bounds.top)
     matrix.postScale(scale, scale)
-    matrix.postTranslate(100f, 100f)
+    matrix.postTranslate(padding, padding)
 
     rawPath.transform(matrix)
     return rawPath.asComposePath()
+}
+
+/**
+ * Splits SVG path data into individual stroke segments by cutting at each
+ * absolute-move command (`M`).  Compound glyphs (e.g. আ, ঃ) are naturally
+ * decomposed this way, giving independent guide paths for the Watch animation
+ * and Hint feature.
+ *
+ * When the path data contains only one `M` (a single stroke) the original
+ * string is returned as a one-element list.
+ */
+fun splitIntoStrokes(pathData: String): List<String> {
+    if (pathData.isBlank()) return listOf(pathData)
+
+    // Find every absolute-M command position.
+    // The regex matches 'M' followed by a digit, minus, or period
+    // (guards against false positives like the letter 'm' in SVG).
+    val pattern = Regex("M(?=[0-9.\\-])")
+    val matches = pattern.findAll(pathData).toList()
+
+    if (matches.size <= 1) return listOf(pathData)
+
+    return matches.mapIndexed { index, match ->
+        val start = match.range.first
+        val end = if (index + 1 < matches.size) matches[index + 1].range.first else pathData.length
+        pathData.substring(start, end).trim()
+    }
 }
 
 /**

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LetterHeader(
     letterName: String,
+    romanized: String,
     isPlaying: Boolean,
     onPlayClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -31,14 +32,23 @@ fun LetterHeader(
     )
 
     Row(
-        modifier = modifier.padding(bottom = 24.dp),
+        modifier = modifier.padding(bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = stringResource(R.string.trace_prefix) + letterName,
-            style = MaterialTheme.typography.headlineLarge
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.trace_prefix) + letterName,
+                style = MaterialTheme.typography.headlineLarge
+            )
+            if (romanized.isNotEmpty()) {
+                Text(
+                    text = romanized,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
         Spacer(modifier = Modifier.width(16.dp))
         IconButton(onClick = onPlayClick) {
             Icon(

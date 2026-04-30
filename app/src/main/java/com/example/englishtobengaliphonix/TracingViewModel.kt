@@ -79,6 +79,19 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
     private val _currentBestScore = MutableStateFlow(ProgressRepository.UNPLAYED)
     val currentBestScore: StateFlow<Float> = _currentBestScore.asStateFlow()
 
+    // ── Responsive canvas size ───────────────────────────────────────────────
+    /** Canvas size in pixels, set from the UI once the canvas is measured. */
+    private var canvasSizePx: Float = 800f
+
+    /**
+     * Called by the UI composable once the tracing canvas has been laid out.
+     * Updating [canvasSizePx] ensures [scalePath] targets the real canvas
+     * rather than the legacy 800 px placeholder.
+     */
+    fun setCanvasSize(sizeInPx: Float) {
+        canvasSizePx = sizeInPx
+    }
+
     private var animationJob: Job? = null
     private var mediaPlayer: MediaPlayer? = null
 
@@ -88,9 +101,16 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
 
     val currentLetter get() = letters[_currentLetterIndex.value]
 
-    /** Guide paths to animate/hint; falls back to mainPath when guidePaths is empty. */
+    /**
+     * Guide paths to animate/hint.
+     *
+     * If the letter has explicit [BengaliLetter.guidePaths] they are used as-is.
+     * Otherwise [splitIntoStrokes] decomposes [BengaliLetter.mainPath] on each
+     * absolute-M command, so compound glyphs (e.g. আ, ঃ) automatically get
+     * independent per-stroke hints and Watch animations.
+     */
     val effectiveGuidePaths get() =
-        currentLetter.guidePaths.ifEmpty { listOf(currentLetter.mainPath) }
+        currentLetter.guidePaths.ifEmpty { splitIntoStrokes(currentLetter.mainPath) }
 
     // ── Category selection ───────────────────────────────────────────────────
     fun selectCategory(category: LetterCategory) {
@@ -212,6 +232,8 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
      *  3. Score = (covered guide points / total guide points) × 100.
      */
     fun scoreUserPath() {
+        if (!_hasUserDrawn.value) return
+
         val androidUserPath = _userPath.value.asAndroidPath()
         val userPoints = sampleAndroidPath(androidUserPath)
 
@@ -221,7 +243,9 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
         }
 
         val guidePoints = effectiveGuidePaths
-            .flatMap { svgData -> sampleAndroidPath(scalePath(svgData).asAndroidPath()) }
+            .flatMap { svgData ->
+                sampleAndroidPath(scalePath(svgData, canvasSizePx).asAndroidPath())
+            }
 
         if (guidePoints.isEmpty()) {
             _lastScore.value = 100f
