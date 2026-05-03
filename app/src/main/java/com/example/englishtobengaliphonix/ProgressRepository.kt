@@ -21,10 +21,15 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  */
 class ProgressRepository(private val context: Context) {
 
+    // Pre-built key cache to avoid recreating Preferences.Key objects on every access
+    private val keyCache = mutableMapOf<String, Preferences.Key<Float>>()
+    private fun keyFor(letterName: String): Preferences.Key<Float> =
+        keyCache.getOrPut(letterName) { floatPreferencesKey("score_$letterName") }
+
     /** Returns the stored best score as a [Flow], emitting [UNPLAYED] if never scored. */
     fun getBestScoreFlow(letterName: String): Flow<Float> =
         context.dataStore.data.map { prefs ->
-            prefs[floatPreferencesKey(keyFor(letterName))] ?: UNPLAYED
+            prefs[keyFor(letterName)] ?: UNPLAYED
         }
 
     /**
@@ -39,7 +44,7 @@ class ProgressRepository(private val context: Context) {
      * (or when the letter has never been scored before).
      */
     suspend fun saveBestScore(letterName: String, score: Float) {
-        val key = floatPreferencesKey(keyFor(letterName))
+        val key = keyFor(letterName)
         context.dataStore.edit { prefs ->
             val current = prefs[key] ?: UNPLAYED
             if (score > current) {
@@ -55,6 +60,5 @@ class ProgressRepository(private val context: Context) {
 
     companion object {
         const val UNPLAYED = -1f
-        private fun keyFor(name: String) = "score_$name"
     }
 }
