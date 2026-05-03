@@ -1,4 +1,4 @@
-package com.example.englishtobengaliphonix
+package com.bengalialphabettracing.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.englishtobengaliphonix.ui.theme.EnglishToBengaliPhonixTheme
+import com.bengalialphabettracing.app.ui.theme.BengaliTracingTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            EnglishToBengaliPhonixTheme {
+            BengaliTracingTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

@@ -1,4 +1,4 @@
-package com.example.englishtobengaliphonix
+package com.bengalialphabettracing.app
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path

@@ -18,6 +18,12 @@
     <string name="btn_clear_progress">Clear</string>
     <string name="cd_clear_progress">Clear all progress</string>
 
+    <!-- Clear-progress confirmation dialog -->
+    <string name="dialog_clear_title">Clear all progress?</string>
+    <string name="dialog_clear_message">This will permanently delete all your best scores. This action cannot be undone.</string>
+    <string name="dialog_clear_confirm">Clear</string>
+    <string name="dialog_clear_cancel">Cancel</string>
+
     <!-- Score card feedback -->
     <string name="score_excellent">Excellent! 🌟</string>
     <string name="score_great">Great job! 👍</string>

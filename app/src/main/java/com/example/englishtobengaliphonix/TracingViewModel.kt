@@ -1,4 +1,4 @@
-package com.example.englishtobengaliphonix
+package com.bengalialphabettracing.app
 
 import android.app.Application
 import android.media.MediaPlayer
@@ -96,7 +96,7 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
     private var mediaPlayer: MediaPlayer? = null
 
     init {
-        refreshProgress()
+        viewModelScope.launch { refreshProgress() }
     }
 
     val currentLetter get() = letters[_currentLetterIndex.value]
@@ -117,7 +117,7 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
         _selectedCategory.value = category
         _currentLetterIndex.value = rangeFor[category]!!.first
         clearPath()
-        refreshProgress()
+        viewModelScope.launch { refreshProgress() }
     }
 
     // ── Audio ────────────────────────────────────────────────────────────────
@@ -148,7 +148,7 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
         val next = _currentLetterIndex.value + 1
         _currentLetterIndex.value = if (next > range.last) range.first else next
         clearPath()
-        refreshProgress()
+        viewModelScope.launch { refreshProgress() }
     }
 
     fun previousLetter() {
@@ -156,7 +156,7 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
         val prev = _currentLetterIndex.value - 1
         _currentLetterIndex.value = if (prev < range.first) range.last else prev
         clearPath()
-        refreshProgress()
+        viewModelScope.launch { refreshProgress() }
     }
 
     // ── Drawing ──────────────────────────────────────────────────────────────
@@ -263,15 +263,19 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
 
         val score = (coveredCount.toFloat() / guidePoints.size * 100f).coerceIn(0f, 100f)
         _lastScore.value = score
-        progressRepository.saveBestScore(currentLetter.name, score)
-        refreshProgress()
+        viewModelScope.launch {
+            progressRepository.saveBestScore(currentLetter.name, score)
+            refreshProgress()
+        }
     }
 
     // ── Progress tracking ────────────────────────────────────────────────────
     /** Clears all stored best scores and resets the in-memory progress state. */
     fun clearAllProgress() {
-        progressRepository.clearAll()
-        refreshProgress()
+        viewModelScope.launch {
+            progressRepository.clearAll()
+            refreshProgress()
+        }
     }
 
     // ── Private helpers ──────────────────────────────────────────────────────
@@ -279,7 +283,7 @@ class TracingViewModel(application: Application) : AndroidViewModel(application)
      * Updates [_categoryProgress] and [_currentBestScore] from the repository.
      * Called whenever the letter, category, or stored scores may have changed.
      */
-    private fun refreshProgress() {
+    private suspend fun refreshProgress() {
         val range = rangeFor[_selectedCategory.value]!!
         val categoryLetters = letters.slice(range)
         val practiced = categoryLetters.count {

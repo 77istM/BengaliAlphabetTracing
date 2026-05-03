@@ -1,4 +1,4 @@
-package com.example.englishtobengaliphonix
+package com.bengalialphabettracing.app
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*

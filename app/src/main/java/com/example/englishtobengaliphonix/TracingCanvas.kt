@@ -1,4 +1,4 @@
-package com.example.englishtobengaliphonix
+package com.bengalialphabettracing.app
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -32,7 +33,9 @@ fun TracingCanvas(
     onDragStart: (Offset) -> Unit,
     onDrag: (Offset) -> Unit,
     onDragEnd: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** Square side length of the canvas. Caller passes the responsive size. */
+    canvasSize: Dp = 350.dp
 ) {
     // Pre-compute animated path and tip position before entering the draw scope
     val partialAnimPath: Path?
@@ -48,7 +51,7 @@ fun TracingCanvas(
 
     Box(
         modifier = modifier
-            .size(350.dp)
+            .size(canvasSize)
             .clip(RoundedCornerShape(16.dp))
             .background(Color(0xFFF5F5F5))
             .pointerInput(letterPath, isAnimating) {

@@ -1,4 +1,4 @@
-package com.example.englishtobengaliphonix
+package com.bengalialphabettracing.app
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
